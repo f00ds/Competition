@@ -1,0 +1,37 @@
+version: "3"
+
+services:
+  farm-lb:
+    container_name: farm-lb
+    image: nginx:latest
+    hostname: farm-lb
+    ports:
+      - "443:443"
+    depends_on:
+      - farm-1
+      - farm-2
+    volumes:
+      - ./default.conf:/etc/nginx/conf.d/default.conf
+      - ./certs/:/etc/nginx/certs/
+    networks:
+      - nginx_lb
+  farm-1:
+    container_name: farm-1
+    image: nginx:latest
+    hostname: farm-1
+    volumes:
+      - ./public.html:/usr/share/nginx/html/public.html
+    networks:
+      - nginx_lb
+  farm-2:
+    container_name: farm-2
+    image: nginx:latest
+    hostname: farm-2
+    volumes:
+      - ./external.html:/usr/share/nginx/html/external.html
+    networks:
+      - nginx_lb
+
+networks:
+  nginx_lb:
+    driver: bridge
